@@ -80,6 +80,20 @@
                 </button>
             </div>
         </div>
+
+        <!-- Real-Time Cloud Sync Bar with Android App -->
+        <div class="bg-emeraldTheme-950 px-4 py-1.5 text-white text-[11px] border-t border-emeraldTheme-800/60 shadow-inner">
+            <div class="max-w-md mx-auto flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="cloudSyncStatusText" class="text-emerald-100 font-medium">Terhubung ke Android &bull; Real-Time</span>
+                </div>
+                <button onclick="manualCloudSync()" class="text-[10px] text-amber-300 hover:text-white font-bold flex items-center space-x-1 bg-emeraldTheme-900 px-2 py-0.5 rounded border border-emerald-700">
+                    <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                    <span>Sinkron</span>
+                </button>
+            </div>
+        </div>
     </header>
 
     <!-- Main Container (Mobile Form Factor Centered) -->
@@ -183,6 +197,31 @@
                     <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
                     <span>Keluar</span>
                 </button>
+            </div>
+
+            <!-- Real-Time Saldo Rekapitulasi Card (Identical to Android APK) -->
+            <div class="bg-gradient-to-br from-emeraldTheme-900 to-emeraldTheme-950 text-white rounded-2xl p-4 shadow space-y-3 border border-emeraldTheme-700/50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="wallet" class="w-4 h-4 text-amber-300"></i>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-200">Rekap Kas Real-Time</span>
+                    </div>
+                    <span class="text-[10px] bg-amber-400 text-emerald-950 font-extrabold px-2 py-0.5 rounded-full">KAS AKTIF</span>
+                </div>
+                <div class="border-b border-emerald-800/80 pb-2">
+                    <span class="text-[11px] text-emerald-300">Saldo Kas Tersedia:</span>
+                    <h3 id="adminSaldoKasAktif" class="text-2xl font-black text-amber-300 tracking-tight">Rp 0</h3>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div class="bg-emerald-800/50 p-2 rounded-xl">
+                        <span class="text-[10px] text-emerald-200 block">Total Kas Masuk (Iuran):</span>
+                        <span id="adminTotalKasMasuk" class="font-bold text-emerald-100">Rp 0</span>
+                    </div>
+                    <div class="bg-emerald-800/50 p-2 rounded-xl">
+                        <span class="text-[10px] text-emerald-200 block">Total Kas Keluar (Pencairan):</span>
+                        <span id="adminTotalKasKeluar" class="font-bold text-amber-200">Rp 0</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Admin Nav Tabs -->
@@ -568,6 +607,94 @@
         const STORAGE_KEY_WINNERS = "arisan_winners_v2";
         const STORAGE_KEY_CURRENT_USER = "arisan_current_user_v2";
 
+        // Global Real-Time Cloud Sync with Android App
+        const CLOUD_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1a78eab933715";
+        let isCloudSyncing = false;
+        let lastCloudTimestamp = 0;
+
+        async function pushToCloud() {
+            try {
+                const groups = getGroups();
+                const users = getUsers();
+                const winners = getWinners();
+                const now = Date.now();
+                lastCloudTimestamp = now;
+
+                const payload = {
+                    lastUpdated: now,
+                    groups: groups,
+                    users: users,
+                    winners: winners
+                };
+
+                await fetch(CLOUD_SYNC_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        name: "ARISAN_BY_CI_STORE",
+                        data: { content: JSON.stringify(payload) }
+                    })
+                });
+
+                const statusEl = document.getElementById("cloudSyncStatusText");
+                if (statusEl) {
+                    statusEl.innerHTML = "Tersinkron dengan Android: " + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                }
+            } catch (e) {
+                console.warn("Cloud push error:", e);
+            }
+        }
+
+        async function pullFromCloud(force = false) {
+            if (isCloudSyncing) return;
+            try {
+                isCloudSyncing = true;
+                const res = await fetch(CLOUD_SYNC_URL);
+                if (!res.ok) { isCloudSyncing = false; return; }
+                const json = await res.json();
+                const rawContent = json.data?.content;
+                if (!rawContent) { isCloudSyncing = false; return; }
+
+                const cloudData = JSON.parse(rawContent);
+                if (force || (cloudData.lastUpdated && cloudData.lastUpdated > lastCloudTimestamp)) {
+                    lastCloudTimestamp = cloudData.lastUpdated || Date.now();
+
+                    if (cloudData.groups && cloudData.groups.length > 0) {
+                        localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(cloudData.groups));
+                    }
+                    if (cloudData.users && cloudData.users.length > 0) {
+                        localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(cloudData.users));
+                        const current = getCurrentUser();
+                        if (current) {
+                            const fresh = cloudData.users.find(u => u.id === current.id || (u.username && u.username === current.username));
+                            if (fresh) setCurrentUser(fresh);
+                        }
+                    }
+                    if (cloudData.winners && cloudData.winners.length > 0) {
+                        localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(cloudData.winners));
+                    }
+
+                    renderAppState();
+                    const statusEl = document.getElementById("cloudSyncStatusText");
+                    if (statusEl) {
+                        statusEl.innerHTML = "Tersinkron dengan Android: " + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    }
+                }
+            } catch (e) {
+                console.warn("Cloud pull error:", e);
+            } finally {
+                isCloudSyncing = false;
+            }
+        }
+
+        async function manualCloudSync() {
+            const statusEl = document.getElementById("cloudSyncStatusText");
+            if (statusEl) statusEl.textContent = "Menyinkronkan data dengan Android...";
+            await pullFromCloud(true);
+            await pushToCloud();
+            alert("Berhasil! Data sekarang 100% tersinkronkan secara real-time dengan Aplikasi Android.");
+        }
+
         // Initial Seed Data
         function initSeedData() {
             if (!localStorage.getItem(STORAGE_KEY_GROUPS)) {
@@ -838,8 +965,36 @@
         function renderAdminDashboard() {
             const users = getUsers();
             const groups = getGroups();
+            const winners = getWinners();
             const pendingMembers = users.filter(u => u.verificationStatus === "PENDING");
             document.getElementById("pendingCountBadge").textContent = pendingMembers.length;
+
+            // Calculate Real-Time Saldo Kas (Matching Android APK)
+            let totalKasMasuk = 0;
+            let totalKasKeluar = 0;
+
+            // Kas Masuk from verified paid members
+            users.filter(u => u.role === "MEMBER" && u.verificationStatus === "VERIFIED" && u.paidStatus === "PAID").forEach(u => {
+                const grp = groups.find(g => g.id === u.groupId);
+                if (grp) {
+                    totalKasMasuk += (grp.monthlyDues + grp.adminFee);
+                }
+            });
+
+            // Kas Keluar from lottery winner disbursements
+            winners.forEach(w => {
+                totalKasKeluar += (w.amountWon || 0);
+            });
+
+            const saldoKasAktif = Math.max(0, totalKasMasuk - totalKasKeluar);
+
+            const saldoEl = document.getElementById("adminSaldoKasAktif");
+            const masukEl = document.getElementById("adminTotalKasMasuk");
+            const keluarEl = document.getElementById("adminTotalKasKeluar");
+
+            if (saldoEl) saldoEl.textContent = formatRupiah(saldoKasAktif);
+            if (masukEl) masukEl.textContent = formatRupiah(totalKasMasuk);
+            if (keluarEl) keluarEl.textContent = formatRupiah(totalKasKeluar);
 
             // 1. Pending KYC List
             const kycContainer = document.getElementById("pendingMemberList");
@@ -957,6 +1112,7 @@
                 users[idx].paidStatus = users[idx].paidStatus === "PAID" ? "PENDING" : "PAID";
                 saveUsers(users);
                 renderAdminDashboard();
+                pushToCloud();
             }
         }
 
@@ -1016,6 +1172,7 @@
 
             users.push(newApplicant);
             saveUsers(users);
+            pushToCloud();
             closeRegisterModal();
 
             alert("Pendaftaran Berhasil Dikirim!\n\nData KTP, selfie wajah, dan kontak darurat Anda telah diterima. Admin ARISAN BY CI akan segera menghubungi nomor WhatsApp Anda untuk mengirimkan Username dan Password login.");
@@ -1065,6 +1222,7 @@
             u.password = newPassword;
             u.verificationStatus = "VERIFIED";
             saveUsers(users);
+            pushToCloud();
 
             // Construct WhatsApp message
             const groups = getGroups();
@@ -1129,6 +1287,7 @@
             });
             localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(groups));
             renderAdminDashboard();
+            pushToCloud();
             alert("Kelompok arisan baru berhasil ditambahkan!");
         }
 
@@ -1158,6 +1317,7 @@
             localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(groups));
             localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(winners));
             renderAdminDashboard();
+            pushToCloud();
             alert(`Selamat kepada ${winnerName} telah memenangkan ${formatRupiah(totalPot)} pada putaran ${selectedGrp.currentRound - 1}!`);
         }
 
@@ -1166,6 +1326,10 @@
             initSeedData();
             renderAppState();
             lucide.createIcons();
+            // Initial sync with Android app
+            pullFromCloud(true);
+            // Auto-sync polling every 4 seconds
+            setInterval(() => pullFromCloud(false), 4000);
         });
     </script>
 </body>
