@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ARISAN BY CI - Web & iOS App</title>
+    
+    <!-- iOS Web App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ARISAN BY CI">
+    <meta name="theme-color" content="#064e3b">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=180&h=180&fit=crop">
+
+    <!-- Tailwind CSS CDN & Lucide Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emeraldTheme: {
+                            50: '#ecfdf5',
+                            100: '#d1fae5',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            800: '#065f46',
+                            900: '#064e3b',
+                        },
+                        goldTheme: {
+                            500: '#d97706',
+                            600: '#b45309',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        /* Custom scrollbar for mobile feel */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Top Navigation / Header -->
+    <header class="sticky top-0 z-40 bg-emeraldTheme-900 text-white shadow-md border-b border-emeraldTheme-800">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-2.5">
+                <div class="w-9 h-9 bg-emeraldTheme-600 rounded-xl flex items-center justify-center shadow-inner text-amber-300 font-bold text-lg">
+                    CI
+                </div>
+                <div>
+                    <h1 class="text-base font-extrabold tracking-wide text-white leading-tight">ARISAN BY CI</h1>
+                    <p class="text-[10px] text-emerald-200 uppercase font-semibold tracking-wider">Transparansi Real-Time</p>
+                </div>
+            </div>
+
+            <!-- Header Action: User / iOS Banner -->
+            <div id="headerUserActions" class="flex items-center space-x-2">
+                <button onclick="showIosInstallModal()" class="text-xs bg-emeraldTheme-800 hover:bg-emeraldTheme-700 text-amber-300 px-2.5 py-1.5 rounded-lg flex items-center space-x-1 font-medium transition border border-emeraldTheme-700">
+                    <i data-lucide="share" class="w-3.5 h-3.5"></i>
+                    <span>Pasang di iPhone</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container (Mobile Form Factor Centered) -->
+    <main class="flex-grow max-w-md w-full mx-auto p-4">
+        
+        <!-- ==================== 1. VIEW: LOGIN ==================== -->
+        <section id="viewLogin" class="space-y-4">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emeraldTheme-900 to-emeraldTheme-800 text-white p-5 shadow-lg">
+                <div class="relative z-10">
+                    <span class="inline-block bg-amber-400 text-emerald-950 font-bold text-[11px] px-2.5 py-0.5 rounded-full uppercase mb-2">Web & iPhone Edition</span>
+                    <h2 class="text-xl font-black mb-1">Manajemen Arisan Digital</h2>
+                    <p class="text-xs text-emerald-100 leading-relaxed">
+                        Pantau jatuh tempo iuran, konfirmasi QRIS, transparansi pemenang undian, dan verifikasi anggota resmi.
+                    </p>
+                </div>
+                <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-emeraldTheme-600/30 rounded-full blur-xl pointer-events-none"></div>
+            </div>
+
+            <!-- Login Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                <div class="text-center mb-5">
+                    <h3 class="text-lg font-bold text-slate-800">Masuk ke Akun Anda</h3>
+                    <p class="text-xs text-slate-500 mt-1">Gunakan Username & Password yang diberikan Admin</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Username</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="user" class="w-4 h-4"></i>
+                            </span>
+                            <input type="text" id="loginUsername" required placeholder="Contoh: admin atau siti_emas"
+                                class="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emeraldTheme-500 focus:bg-white outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Password</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                            </span>
+                            <input type="password" id="loginPassword" required placeholder="Masukkan password"
+                                class="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-emeraldTheme-500 focus:bg-white outline-none transition">
+                            <button type="button" onclick="togglePasswordVisibility('loginPassword')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-emeraldTheme-600 hover:bg-emeraldTheme-700 text-white font-bold py-3 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-center space-x-2">
+                        <span>Masuk Sekarang</span>
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </form>
+
+                <div class="relative my-4">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-white px-2 text-slate-400 font-medium">Belum Punya Akun?</span></div>
+                </div>
+
+                <!-- Registration Button -->
+                <button type="button" onclick="openRegisterModal()" class="w-full border border-emeraldTheme-600 text-emeraldTheme-700 hover:bg-emeraldTheme-50 font-bold py-2.5 rounded-xl transition flex items-center justify-center space-x-2 text-sm">
+                    <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    <span>Daftar Calon Anggota (KTP & Wajah)</span>
+                </button>
+            </div>
+
+            <!-- Demo Quick Info -->
+            <div class="bg-emeraldTheme-50 border border-emeraldTheme-200/60 rounded-xl p-3 text-xs text-emeraldTheme-900 flex items-start space-x-2.5">
+                <i data-lucide="info" class="w-4 h-4 text-emeraldTheme-700 flex-shrink-0 mt-0.5"></i>
+                <div>
+                    <span class="font-bold">Info Akun Uji Coba:</span>
+                    <ul class="list-disc list-inside mt-0.5 space-y-0.5 text-[11px] text-emeraldTheme-800">
+                        <li><strong>Admin:</strong> <code class="bg-emerald-100 px-1 rounded font-mono">admin</code> / <code class="bg-emerald-100 px-1 rounded font-mono">admin123</code></li>
+                        <li><strong>Member:</strong> <code class="bg-emerald-100 px-1 rounded font-mono">siti_emas</code> / <code class="bg-emerald-100 px-1 rounded font-mono">user123</code></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 2. VIEW: ADMIN DASHBOARD ==================== -->
+        <section id="viewAdmin" class="hidden space-y-4">
+            <!-- Admin Profile Banner -->
+            <div class="bg-gradient-to-r from-emeraldTheme-900 to-emeraldTheme-800 text-white rounded-2xl p-4 shadow flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 bg-amber-400 text-emeraldTheme-950 rounded-full flex items-center justify-center font-black text-xl shadow">
+                        A
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h2 class="font-bold text-base leading-tight">Admin ARISAN BY CI</h2>
+                            <span class="bg-amber-400 text-emeraldTheme-950 text-[10px] font-bold px-1.5 py-0.5 rounded">ADMIN</span>
+                        </div>
+                        <p class="text-xs text-emerald-200 mt-0.5">Kontrol Penuh Grup, Jatuh Tempo & KYC</p>
+                    </div>
+                </div>
+                <button onclick="handleLogout()" class="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 px-2.5 py-1.5 rounded-lg border border-red-500/40 flex items-center space-x-1">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <span>Keluar</span>
+                </button>
+            </div>
+
+            <!-- Admin Nav Tabs -->
+            <div class="flex bg-slate-200/80 p-1 rounded-xl text-xs font-semibold text-slate-600">
+                <button onclick="switchAdminTab('kyc')" id="tabBtnKyc" class="flex-1 py-2 rounded-lg bg-white text-emeraldTheme-800 shadow-sm transition flex items-center justify-center space-x-1">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>Verifikasi KYC (<span id="pendingCountBadge">0</span>)</span>
+                </button>
+                <button onclick="switchAdminTab('groups')" id="tabBtnGroups" class="flex-1 py-2 rounded-lg hover:text-emeraldTheme-700 transition flex items-center justify-center space-x-1">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                    <span>Kelompok</span>
+                </button>
+                <button onclick="switchAdminTab('bills')" id="tabBtnBills" class="flex-1 py-2 rounded-lg hover:text-emeraldTheme-700 transition flex items-center justify-center space-x-1">
+                    <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                    <span>Jatuh Tempo</span>
+                </button>
+                <button onclick="switchAdminTab('lottery')" id="tabBtnLottery" class="flex-1 py-2 rounded-lg hover:text-emeraldTheme-700 transition flex items-center justify-center space-x-1">
+                    <i data-lucide="gift" class="w-3.5 h-3.5"></i>
+                    <span>Undian</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: KYC VERIFICATION -->
+            <div id="adminTabKyc" class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-800">Calon Anggota Menunggu Verifikasi</h3>
+                    <span class="text-xs text-slate-500">Scan KTP & Selfie Wajah</span>
+                </div>
+                <div id="pendingMemberList" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TAB 2: ARISAN GROUPS MANAGEMENT -->
+            <div id="adminTabGroups" class="hidden space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-800">Daftar Kelompok Arisan</h3>
+                    <button onclick="openAddGroupModal()" class="text-xs bg-emeraldTheme-600 hover:bg-emeraldTheme-700 text-white font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1">
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        <span>Tambah Grup</span>
+                    </button>
+                </div>
+                <div id="adminGroupsList" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TAB 3: DUE DATE & PAYMENT MANAGEMENT -->
+            <div id="adminTabBills" class="hidden space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-800">Kelola Pembayaran & Jatuh Tempo</h3>
+                    <span class="text-xs text-slate-500">Verifikasi QRIS & Iuran</span>
+                </div>
+                <div id="adminBillsList" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- TAB 4: LOTTERY DRAW & WINNERS -->
+            <div id="adminTabLottery" class="hidden space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-800">Undian Pemenang & Pencairan</h3>
+                    <button onclick="openDrawWinnerModal()" class="text-xs bg-amber-500 hover:bg-amber-600 text-white font-bold px-3 py-1.5 rounded-lg flex items-center space-x-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                        <span>Kocok / Tentukan Pemenang</span>
+                    </button>
+                </div>
+                <div id="adminLotteryList" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 3. VIEW: MEMBER DASHBOARD ==================== -->
+        <section id="viewMember" class="hidden space-y-4">
+            <!-- Member Profile Card -->
+            <div class="bg-gradient-to-r from-emeraldTheme-900 to-emeraldTheme-700 text-white rounded-2xl p-4 shadow">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 bg-white text-emeraldTheme-900 rounded-full flex items-center justify-center font-bold text-xl shadow">
+                            <span id="memberAvatarInitial">S</span>
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <h2 id="memberFullName" class="font-bold text-base leading-tight">Nama Anggota</h2>
+                                <span class="bg-emerald-400 text-emerald-950 text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center space-x-0.5">
+                                    <i data-lucide="check" class="w-2.5 h-2.5"></i>
+                                    <span>TERVERIFIKASI</span>
+                                </span>
+                            </div>
+                            <p id="memberUsernameDisplay" class="text-xs text-emerald-200 mt-0.5">@siti_emas</p>
+                        </div>
+                    </div>
+                    <button onclick="handleLogout()" class="text-xs bg-white/10 hover:bg-white/20 text-white px-2.5 py-1.5 rounded-lg flex items-center space-x-1">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                        <span>Keluar</span>
+                    </button>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-emerald-600/50 flex justify-between text-xs text-emerald-100">
+                    <div>
+                        <span class="block text-[10px] text-emerald-300">Kelompok Diikuti:</span>
+                        <span id="memberGroupName" class="font-bold text-white text-sm">Arisan Emas Sejahtera</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-[10px] text-emerald-300">Biaya Admin:</span>
+                        <span id="memberAdminFeeDisplay" class="font-bold text-amber-300 text-sm">Rp 50.000</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Member Bill Status Card -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status Tagihan Periode Ini</span>
+                    <span id="memberBillStatusBadge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        Menunggu Pembayaran
+                    </span>
+                </div>
+
+                <div class="flex justify-between items-baseline pt-1">
+                    <div>
+                        <p class="text-xs text-slate-500">Total Harus Dibayar</p>
+                        <h3 id="memberTotalDueDisplay" class="text-2xl font-black text-slate-800">Rp 1.050.000</h3>
+                        <p class="text-[11px] text-slate-400 mt-0.5">(Iuran Rp 1.000.000 + Admin Rp 50.000)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs text-slate-500">Jatuh Tempo</p>
+                        <p id="memberDueDateDisplay" class="text-xs font-bold text-red-600">10 November 2026</p>
+                    </div>
+                </div>
+
+                <!-- QRIS Action Button -->
+                <button onclick="openQrisModal()" class="w-full bg-emeraldTheme-600 hover:bg-emeraldTheme-700 text-white font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 text-sm mt-2">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i>
+                    <span>Bayar Sekarang via QRIS Resmi</span>
+                </button>
+            </div>
+
+            <!-- Winner List in Member Group -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center space-x-1.5">
+                        <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+                        <span>Daftar Pemenang Kelompok Ini</span>
+                    </h3>
+                    <span class="text-[11px] text-slate-500">Transparansi Undian</span>
+                </div>
+                <div id="memberGroupWinnerList" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-3 text-center text-xs text-slate-400">
+        <p class="font-medium text-slate-500">&copy; 2026 ARISAN BY CI &bull; Transparan & Terpercaya</p>
+        <p class="text-[10px] mt-0.5">Mendukung Android (APK) & iPhone (iOS Safari / PWA)</p>
+    </footer>
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- 1. MODAL: REGISTER MEMBER (KYC) -->
+    <div id="modalRegister" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4 my-8">
+            <div class="flex items-center justify-between border-b pb-3">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-emeraldTheme-100 text-emeraldTheme-700 flex items-center justify-center">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base">Pendaftaran Calon Anggota</h3>
+                        <p class="text-[11px] text-slate-500">Lengkapi data diri, KTP & Selfie Wajah</p>
+                    </div>
+                </div>
+                <button onclick="closeRegisterModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleRegisterSubmit(event)" class="space-y-3.5 text-xs max-h-[75vh] overflow-y-auto pr-1">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Lengkap Sesuai KTP *</label>
+                    <input type="text" id="regFullName" required placeholder="Contoh: Rina Melinda" class="w-full p-2.5 border rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emeraldTheme-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp Aktif *</label>
+                    <input type="tel" id="regPhone" required placeholder="Contoh: 081234567890" class="w-full p-2.5 border rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emeraldTheme-500 outline-none">
+                    <p class="text-[10px] text-slate-400 mt-0.5">Admin akan verifikasi & kirim akun login ke nomor WA ini</p>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">NIK (Nomor Induk Kependudukan) *</label>
+                    <input type="text" id="regNik" maxlength="16" required placeholder="16 digit NIK KTP" class="w-full p-2.5 border rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emeraldTheme-500 outline-none">
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Alamat Domisili *</label>
+                    <textarea id="regAddress" rows="2" required placeholder="Alamat tempat tinggal lengkap..." class="w-full p-2.5 border rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emeraldTheme-500 outline-none"></textarea>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 space-y-2">
+                    <span class="font-bold text-amber-900 flex items-center space-x-1">
+                        <i data-lucide="phone-call" class="w-3.5 h-3.5 text-amber-700"></i>
+                        <span>Kontak Darurat</span>
+                    </span>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="regEmName" required placeholder="Nama Kontak" class="p-2 border rounded-lg bg-white outline-none">
+                        <input type="text" id="regEmRel" required placeholder="Hubungan (Suami/Ibu/dll)" class="p-2 border rounded-lg bg-white outline-none">
+                    </div>
+                    <input type="tel" id="regEmPhone" required placeholder="Nomor WhatsApp Darurat" class="w-full p-2 border rounded-lg bg-white outline-none">
+                </div>
+
+                <!-- Kelompok Arisan Selection -->
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Pilih Kelompok Arisan yang Diinginkan *</label>
+                    <select id="regGroupSelect" required class="w-full p-2.5 border rounded-xl bg-slate-50 focus:bg-white focus:ring-2 focus:ring-emeraldTheme-500 outline-none">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+
+                <!-- KYC Documents Mock Upload -->
+                <div class="space-y-2 pt-1">
+                    <label class="block font-semibold text-slate-700">Dokumen Verifikasi Identitas (KYC) *</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="border-2 border-dashed border-emeraldTheme-300 rounded-xl p-3 text-center bg-emeraldTheme-50/40">
+                            <i data-lucide="id-card" class="w-6 h-6 mx-auto text-emeraldTheme-600 mb-1"></i>
+                            <span class="block text-[11px] font-bold text-slate-700">Scan KTP Asli</span>
+                            <span class="text-[9px] text-emeraldTheme-700 font-semibold bg-emerald-100 px-1 rounded">Otomatis Terlampir</span>
+                        </div>
+                        <div class="border-2 border-dashed border-emeraldTheme-300 rounded-xl p-3 text-center bg-emeraldTheme-50/40">
+                            <i data-lucide="camera" class="w-6 h-6 mx-auto text-emeraldTheme-600 mb-1"></i>
+                            <span class="block text-[11px] font-bold text-slate-700">Selfie Wajah</span>
+                            <span class="text-[9px] text-emeraldTheme-700 font-semibold bg-emerald-100 px-1 rounded">Otomatis Terlampir</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-emeraldTheme-600 hover:bg-emeraldTheme-700 text-white font-bold py-3 rounded-xl shadow transition flex items-center justify-center space-x-1.5">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Kirim Pendaftaran ke Admin</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. MODAL: QRIS PAYMENT -->
+    <div id="modalQris" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl text-center space-y-4">
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm">Pembayaran QRIS ARISAN BY CI</h3>
+                <button onclick="closeQrisModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- QRIS Code Mock / Visual -->
+            <div class="bg-slate-50 border border-slate-200 p-4 rounded-xl inline-block shadow-inner">
+                <div class="w-48 h-48 mx-auto bg-white border-4 border-slate-800 p-2 rounded-lg flex flex-col items-center justify-center relative">
+                    <!-- Standard QR Visual Representation -->
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=00020101021126610014ID.LINKAJA.WWW01189360091100212345670215000000000000001510400005204599953033605802ID5912ARISAN+BY+CI6007JAKARTA6304ABCD" 
+                         alt="QRIS ARISAN BY CI" class="w-40 h-40 object-contain rounded">
+                </div>
+                <p class="text-[10px] text-slate-500 font-bold mt-2 uppercase tracking-wider">NMID: ID102026ARISANCI99</p>
+            </div>
+
+            <div class="bg-emerald-50 rounded-xl p-3 text-xs text-left space-y-1 border border-emerald-200">
+                <div class="flex justify-between">
+                    <span class="text-slate-600">Total Tagihan:</span>
+                    <span id="qrisModalTotal" class="font-bold text-emerald-900">Rp 1.050.000</span>
+                </div>
+                <div class="flex justify-between text-[11px] text-slate-500">
+                    <span>Penerima:</span>
+                    <span class="font-semibold text-slate-700">ARISAN BY CI OFFICIAL</span>
+                </div>
+            </div>
+
+            <!-- Confirm via WA -->
+            <button onclick="handleConfirmPaymentWA()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 text-xs">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                <span>Kirim Bukti Bayar ke WhatsApp Admin</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. MODAL: IPHONE / IOS INSTALL GUIDE -->
+    <div id="modalIosInstall" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-2">
+                <div class="flex items-center space-x-2">
+                    <div class="w-7 h-7 bg-slate-100 rounded-lg flex items-center justify-center text-slate-800">
+                        <i data-lucide="apple" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-sm">Pasang di iPhone (PWA)</h3>
+                </div>
+                <button onclick="closeIosInstallModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs text-slate-600">
+                <p>Website ini dioptimalkan khusus untuk iPhone dan bisa dijadikan aplikasi tanpa perlu App Store:</p>
+                <ol class="space-y-2 list-decimal list-inside bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <li class="leading-relaxed">
+                        Buka web ini di <strong>Safari</strong> pada iPhone Anda.
+                    </li>
+                    <li class="leading-relaxed">
+                        Tekan tombol <strong>Bagikan / Share</strong> (<i data-lucide="share" class="w-3.5 h-3.5 inline text-blue-500"></i>) di bilah bawah Safari.
+                    </li>
+                    <li class="leading-relaxed">
+                        Geser ke bawah lalu pilih <strong>"Tambah ke Layar Utama" (Add to Home Screen)</strong>.
+                    </li>
+                    <li class="leading-relaxed">
+                        Tekan <strong>"Tambah" (Add)</strong> di pojok kanan atas.
+                    </li>
+                </ol>
+                <div class="bg-emerald-50 text-emerald-800 p-2.5 rounded-xl text-[11px] flex items-center space-x-2 border border-emerald-200">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600 flex-shrink-0"></i>
+                    <span>Ikon ARISAN BY CI akan langsung muncul di layar utama iPhone Anda seperti aplikasi native!</span>
+                </div>
+            </div>
+
+            <button onclick="closeIosInstallModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl text-xs">
+                Tutup Panduan
+            </button>
+        </div>
+    </div>
+
+    <!-- 4. MODAL: ADMIN ASSIGN CREDENTIALS -->
+    <div id="modalAssignCredentials" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b pb-2">
+                <h3 class="font-bold text-slate-800 text-sm">Verifikasi & Buat Akun Anggota</h3>
+                <button onclick="closeAssignModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nama Anggota</label>
+                    <input type="text" id="assignMemberName" readonly class="w-full p-2 bg-slate-100 border rounded-lg text-slate-600">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Nomor WhatsApp</label>
+                    <input type="text" id="assignMemberPhone" readonly class="w-full p-2 bg-slate-100 border rounded-lg text-slate-600">
+                </div>
+                <div>
+                    <label class="block font-semibold text-slate-700 mb-1">Kelompok Arisan</label>
+                    <input type="text" id="assignGroupName" readonly class="w-full p-2 bg-slate-100 border rounded-lg text-slate-600">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Username Resmi</label>
+                        <input type="text" id="assignUsername" class="w-full p-2 border rounded-lg font-mono text-emerald-800 font-bold bg-emerald-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-slate-700 mb-1">Password</label>
+                        <input type="text" id="assignPassword" value="user123" class="w-full p-2 border rounded-lg font-mono text-emerald-800 font-bold bg-emerald-50">
+                    </div>
+                </div>
+
+                <div class="pt-2 space-y-2">
+                    <button onclick="confirmApproveAndSendWA()" class="w-full bg-emeraldTheme-600 hover:bg-emeraldTheme-700 text-white font-bold py-2.5 rounded-xl shadow transition flex items-center justify-center space-x-2 text-xs">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Setujui & Kirim Akun ke WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT APPLICATION LOGIC ==================== -->
+    <script>
+        // Storage Keys
+        const STORAGE_KEY_USERS = "arisan_users_v2";
+        const STORAGE_KEY_GROUPS = "arisan_groups_v2";
+        const STORAGE_KEY_WINNERS = "arisan_winners_v2";
+        const STORAGE_KEY_CURRENT_USER = "arisan_current_user_v2";
+
+        // Initial Seed Data
+        function initSeedData() {
+            if (!localStorage.getItem(STORAGE_KEY_GROUPS)) {
+                const initialGroups = [
+                    { id: 1, name: "Arisan Emas Sejahtera", monthlyDues: 1000000, adminFee: 50000, dueDateDay: 10, totalMembers: 10, currentRound: 3 },
+                    { id: 2, name: "Arisan Berlian Prioritas", monthlyDues: 2500000, adminFee: 75000, dueDateDay: 15, totalMembers: 8, currentRound: 2 },
+                    { id: 3, name: "Arisan Perak Ceria", monthlyDues: 500000, adminFee: 25000, dueDateDay: 5, totalMembers: 12, currentRound: 5 }
+                ];
+                localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(initialGroups));
+            }
+
+            if (!localStorage.getItem(STORAGE_KEY_USERS)) {
+                const initialUsers = [
+                    {
+                        id: 1,
+                        username: "admin",
+                        password: "admin123",
+                        role: "ADMIN",
+                        fullName: "Admin CI Arisan",
+                        phoneNumber: "081288889999",
+                        groupId: null,
+                        verificationStatus: "VERIFIED"
+                    },
+                    {
+                        id: 2,
+                        username: "siti_emas",
+                        password: "user123",
+                        role: "MEMBER",
+                        fullName: "Siti Rahmawati",
+                        phoneNumber: "081234567891",
+                        groupId: 1,
+                        verificationStatus: "VERIFIED",
+                        nik: "3171010101900002",
+                        address: "Jl. Melati No. 12, Jakarta",
+                        paidStatus: "PENDING"
+                    },
+                    {
+                        id: 3,
+                        username: "dewi_berlian",
+                        password: "user123",
+                        role: "MEMBER",
+                        fullName: "Dewi Anggraini",
+                        phoneNumber: "081234567892",
+                        groupId: 2,
+                        verificationStatus: "VERIFIED",
+                        nik: "3171010101900003",
+                        address: "Jl. Anggrek No. 45, Jakarta",
+                        paidStatus: "PAID"
+                    },
+                    // Pending applicants for Admin demo
+                    {
+                        id: 4,
+                        username: "",
+                        password: "",
+                        role: "MEMBER",
+                        fullName: "Budi Santoso",
+                        phoneNumber: "081299991111",
+                        groupId: 1,
+                        verificationStatus: "PENDING",
+                        nik: "3201010101920005",
+                        address: "Jl. Merdeka Barat No. 8, Bandung",
+                        emergencyName: "Ratna Santoso",
+                        emergencyPhone: "081299992222",
+                        emergencyRelation: "Istri",
+                        ktpPhoto: "sample_ktp_card",
+                        selfiePhoto: "selfie_ktp_mockup"
+                    },
+                    {
+                        id: 5,
+                        username: "",
+                        password: "",
+                        role: "MEMBER",
+                        fullName: "Nurul Hidayah",
+                        phoneNumber: "081377773333",
+                        groupId: 2,
+                        verificationStatus: "PENDING",
+                        nik: "3201010101950007",
+                        address: "Jl. Diponegoro No. 20, Surabaya",
+                        emergencyName: "Hidayat",
+                        emergencyPhone: "081377774444",
+                        emergencyRelation: "Ayah",
+                        ktpPhoto: "sample_ktp_card",
+                        selfiePhoto: "selfie_ktp_mockup"
+                    }
+                ];
+                localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(initialUsers));
+            }
+
+            if (!localStorage.getItem(STORAGE_KEY_WINNERS)) {
+                const initialWinners = [
+                    { id: 1, groupId: 1, round: 1, winnerName: "Rani Indah", amountWon: 10000000, dateWon: "10 September 2026" },
+                    { id: 2, groupId: 1, round: 2, winnerName: "Maya Sari", amountWon: 10000000, dateWon: "10 Oktober 2026" },
+                    { id: 3, groupId: 2, round: 1, winnerName: "Dewi Anggraini", amountWon: 20000000, dateWon: "15 Oktober 2026" }
+                ];
+                localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(initialWinners));
+            }
+        }
+
+        // Helpers
+        function formatRupiah(num) {
+            return "Rp " + Number(num || 0).toLocaleString("id-ID");
+        }
+
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_USERS) || "[]");
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(users));
+        }
+
+        function getGroups() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_GROUPS) || "[]");
+        }
+
+        function getWinners() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_WINNERS) || "[]");
+        }
+
+        function getCurrentUser() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY_CURRENT_USER) || "null");
+        }
+
+        function setCurrentUser(user) {
+            if (user) {
+                localStorage.setItem(STORAGE_KEY_CURRENT_USER, JSON.stringify(user));
+            } else {
+                localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
+            }
+        }
+
+        // Auth
+        function handleLogin(e) {
+            e.preventDefault();
+            const u = document.getElementById("loginUsername").value.trim().toLowerCase();
+            const p = document.getElementById("loginPassword").value.trim();
+
+            const users = getUsers();
+            const found = users.find(x => x.username.toLowerCase() === u && x.password === p);
+
+            if (!found) {
+                alert("Username atau password salah. Pastikan menggunakan akun yang sudah diverifikasi oleh admin.");
+                return;
+            }
+
+            if (found.role === "MEMBER" && found.verificationStatus !== "VERIFIED") {
+                alert("Akun Anda sedang dalam proses verifikasi dokumen oleh Admin ARISAN BY CI.");
+                return;
+            }
+
+            setCurrentUser(found);
+            renderAppState();
+        }
+
+        function handleLogout() {
+            setCurrentUser(null);
+            renderAppState();
+        }
+
+        function togglePasswordVisibility(fieldId) {
+            const input = document.getElementById(fieldId);
+            if (input.type === "password") {
+                input.type = "text";
+            } else {
+                input.type = "password";
+            }
+        }
+
+        // Admin Tab Switching
+        function switchAdminTab(tab) {
+            document.getElementById("adminTabKyc").classList.toggle("hidden", tab !== 'kyc');
+            document.getElementById("adminTabGroups").classList.toggle("hidden", tab !== 'groups');
+            document.getElementById("adminTabBills").classList.toggle("hidden", tab !== 'bills');
+            document.getElementById("adminTabLottery").classList.toggle("hidden", tab !== 'lottery');
+
+            const tabs = ['kyc', 'groups', 'bills', 'lottery'];
+            tabs.forEach(t => {
+                const btn = document.getElementById("tabBtn" + t.charAt(0).toUpperCase() + t.slice(1));
+                if (t === tab) {
+                    btn.className = "flex-1 py-2 rounded-lg bg-white text-emeraldTheme-800 shadow-sm transition flex items-center justify-center space-x-1";
+                } else {
+                    btn.className = "flex-1 py-2 rounded-lg hover:text-emeraldTheme-700 transition flex items-center justify-center space-x-1";
+                }
+            });
+            lucide.createIcons();
+        }
+
+        // Render UI
+        function renderAppState() {
+            const user = getCurrentUser();
+            const viewLogin = document.getElementById("viewLogin");
+            const viewAdmin = document.getElementById("viewAdmin");
+            const viewMember = document.getElementById("viewMember");
+
+            if (!user) {
+                viewLogin.classList.remove("hidden");
+                viewAdmin.classList.add("hidden");
+                viewMember.classList.add("hidden");
+            } else if (user.role === "ADMIN") {
+                viewLogin.classList.add("hidden");
+                viewAdmin.classList.remove("hidden");
+                viewMember.classList.add("hidden");
+                renderAdminDashboard();
+            } else {
+                viewLogin.classList.add("hidden");
+                viewAdmin.classList.add("hidden");
+                viewMember.classList.remove("hidden");
+                renderMemberDashboard(user);
+            }
+
+            lucide.createIcons();
+        }
+
+        // Render Member Screen
+        function renderMemberDashboard(user) {
+            const groups = getGroups();
+            const userGroup = groups.find(g => g.id === user.groupId) || groups[0];
+
+            document.getElementById("memberAvatarInitial").textContent = (user.fullName || "A").charAt(0).toUpperCase();
+            document.getElementById("memberFullName").textContent = user.fullName;
+            document.getElementById("memberUsernameDisplay").textContent = "@" + user.username;
+            document.getElementById("memberGroupName").textContent = userGroup.name;
+            document.getElementById("memberAdminFeeDisplay").textContent = formatRupiah(userGroup.adminFee);
+
+            const totalDue = userGroup.monthlyDues + userGroup.adminFee;
+            document.getElementById("memberTotalDueDisplay").textContent = formatRupiah(totalDue);
+            document.getElementById("qrisModalTotal").textContent = formatRupiah(totalDue);
+            document.getElementById("memberDueDateDisplay").textContent = userGroup.dueDateDay + " November 2026";
+
+            // Status Badge
+            const isPaid = user.paidStatus === "PAID";
+            const badge = document.getElementById("memberBillStatusBadge");
+            if (isPaid) {
+                badge.textContent = "Lunas (Terverifikasi)";
+                badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800";
+            } else {
+                badge.textContent = "Menunggu Pembayaran";
+                badge.className = "text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800";
+            }
+
+            // Winners list for this group only
+            const winners = getWinners().filter(w => w.groupId === userGroup.id);
+            const winnerContainer = document.getElementById("memberGroupWinnerList");
+            if (winners.length === 0) {
+                winnerContainer.innerHTML = `<p class="text-xs text-slate-400 italic">Belum ada pemenang yang diundi untuk kelompok ini.</p>`;
+            } else {
+                winnerContainer.innerHTML = winners.map(w => `
+                    <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-6 h-6 bg-amber-100 text-amber-700 font-bold rounded-full flex items-center justify-center text-[10px]">
+                                #${w.round}
+                            </span>
+                            <div>
+                                <h4 class="font-bold text-slate-800">${w.winnerName}</h4>
+                                <span class="text-[10px] text-slate-400">${w.dateWon}</span>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black text-emerald-700">${formatRupiah(w.amountWon)}</span>
+                            <span class="block text-[9px] text-emerald-600 font-medium">Telah Dicairkan</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render Admin Screen
+        function renderAdminDashboard() {
+            const users = getUsers();
+            const groups = getGroups();
+            const pendingMembers = users.filter(u => u.verificationStatus === "PENDING");
+            document.getElementById("pendingCountBadge").textContent = pendingMembers.length;
+
+            // 1. Pending KYC List
+            const kycContainer = document.getElementById("pendingMemberList");
+            if (pendingMembers.length === 0) {
+                kycContainer.innerHTML = `<div class="bg-white p-4 rounded-xl text-center text-xs text-slate-400 border">Semua calon anggota telah diverifikasi.</div>`;
+            } else {
+                kycContainer.innerHTML = pendingMembers.map(m => {
+                    const grp = groups.find(g => g.id === m.groupId) || { name: 'Umum' };
+                    return `
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-sm">${m.fullName}</h4>
+                                    <p class="text-xs text-slate-500 font-mono mt-0.5">NIK: ${m.nik || '-'}</p>
+                                    <p class="text-[11px] text-emerald-700 font-semibold mt-1">Grup: ${grp.name}</p>
+                                </div>
+                                <span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                    Menunggu KYC
+                                </span>
+                            </div>
+
+                            <div class="bg-slate-50 p-2.5 rounded-lg text-xs space-y-1 text-slate-600">
+                                <div><strong class="text-slate-700">WhatsApp:</strong> ${m.phoneNumber}</div>
+                                <div><strong class="text-slate-700">Alamat:</strong> ${m.address}</div>
+                                <div><strong class="text-slate-700">Kontak Darurat:</strong> ${m.emergencyName || '-'} (${m.emergencyRelation || '-'} - ${m.emergencyPhone || '-'})</div>
+                            </div>
+
+                            <div class="flex items-center space-x-2 pt-1">
+                                <a href="https://wa.me/${cleanPhone(m.phoneNumber)}?text=${encodeURIComponent('Halo Kak ' + m.fullName + ', kami dari Manajemen ARISAN BY CI ingin memverifikasi pendaftaran arisan Anda.')}" 
+                                   target="_blank" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 font-semibold py-2 rounded-lg text-xs text-center flex items-center justify-center space-x-1">
+                                    <i data-lucide="message-circle" class="w-3.5 h-3.5"></i>
+                                    <span>Cek WA</span>
+                                </a>
+                                <button onclick="openAssignModal(${m.id})" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-xs flex items-center justify-center space-x-1">
+                                    <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+                                    <span>Verifikasi & Beri Akun</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 2. Groups List
+            const groupsContainer = document.getElementById("adminGroupsList");
+            groupsContainer.innerHTML = groups.map(g => `
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-2">
+                    <div class="flex justify-between items-center">
+                        <h4 class="font-bold text-slate-800 text-sm">${g.name}</h4>
+                        <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Putaran #${g.currentRound}</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-600">
+                        <div>Iuran: <strong>${formatRupiah(g.monthlyDues)}</strong></div>
+                        <div>Fee Admin: <strong class="text-amber-700">${formatRupiah(g.adminFee)}</strong></div>
+                        <div>Jatuh Tempo: <strong>Tgl ${g.dueDateDay}</strong></div>
+                        <div>Target Anggota: <strong>${g.totalMembers} Orang</strong></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // 3. Bills List
+            const members = users.filter(u => u.role === "MEMBER" && u.verificationStatus === "VERIFIED");
+            const billsContainer = document.getElementById("adminBillsList");
+            billsContainer.innerHTML = members.map(m => {
+                const grp = groups.find(g => g.id === m.groupId) || { monthlyDues: 1000000, adminFee: 50000, dueDateDay: 10 };
+                const isPaid = m.paidStatus === "PAID";
+                return `
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between text-xs">
+                        <div>
+                            <h4 class="font-bold text-slate-800">${m.fullName} (${m.username})</h4>
+                            <p class="text-slate-500 text-[11px]">Jatuh Tempo: Tgl ${grp.dueDateDay} &bull; Tagihan: ${formatRupiah(grp.monthlyDues + grp.adminFee)}</p>
+                        </div>
+                        <div>
+                            ${isPaid ? `
+                                <button onclick="togglePaymentStatus(${m.id})" class="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded-lg">
+                                    Lunas &check;
+                                </button>
+                            ` : `
+                                <button onclick="togglePaymentStatus(${m.id})" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2.5 py-1 rounded-lg shadow-sm">
+                                    Tandai Lunas
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // 4. Lottery List
+            const winners = getWinners();
+            const lotteryContainer = document.getElementById("adminLotteryList");
+            lotteryContainer.innerHTML = winners.map(w => {
+                const grp = groups.find(g => g.id === w.groupId) || { name: 'Arisan' };
+                return `
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between text-xs">
+                        <div>
+                            <span class="text-[10px] text-amber-700 font-bold uppercase">${grp.name} &bull; Putaran #${w.round}</span>
+                            <h4 class="font-bold text-slate-800 text-sm mt-0.5">${w.winnerName}</h4>
+                            <p class="text-slate-400 text-[10px]">${w.dateWon}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-black text-emerald-700">${formatRupiah(w.amountWon)}</span>
+                            <span class="block text-[10px] text-slate-500">Pencairan Sukses</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        function togglePaymentStatus(memberId) {
+            const users = getUsers();
+            const idx = users.findIndex(u => u.id === memberId);
+            if (idx !== -1) {
+                users[idx].paidStatus = users[idx].paidStatus === "PAID" ? "PENDING" : "PAID";
+                saveUsers(users);
+                renderAdminDashboard();
+            }
+        }
+
+        // Clean phone for wa.me link (08... -> 628...)
+        function cleanPhone(phone) {
+            let p = String(phone || "").replace(/[^0-9]/g, "");
+            if (p.startsWith("0")) {
+                p = "62" + p.substring(1);
+            }
+            return p;
+        }
+
+        // Member Registration Modal logic
+        function openRegisterModal() {
+            const groups = getGroups();
+            const select = document.getElementById("regGroupSelect");
+            select.innerHTML = groups.map(g => `
+                <option value="${g.id}">${g.name} (${formatRupiah(g.monthlyDues)}/bln + Fee Admin ${formatRupiah(g.adminFee)})</option>
+            `).join('');
+
+            document.getElementById("modalRegister").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeRegisterModal() {
+            document.getElementById("modalRegister").classList.add("hidden");
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const fullName = document.getElementById("regFullName").value.trim();
+            const phone = document.getElementById("regPhone").value.trim();
+            const nik = document.getElementById("regNik").value.trim();
+            const address = document.getElementById("regAddress").value.trim();
+            const emName = document.getElementById("regEmName").value.trim();
+            const emRel = document.getElementById("regEmRel").value.trim();
+            const emPhone = document.getElementById("regEmPhone").value.trim();
+            const groupId = parseInt(document.getElementById("regGroupSelect").value, 10);
+
+            const users = getUsers();
+            const newApplicant = {
+                id: Date.now(),
+                username: "",
+                password: "",
+                role: "MEMBER",
+                fullName: fullName,
+                phoneNumber: phone,
+                nik: nik,
+                address: address,
+                emergencyName: emName,
+                emergencyRelation: emRel,
+                emergencyPhone: emPhone,
+                groupId: groupId,
+                verificationStatus: "PENDING",
+                paidStatus: "PENDING"
+            };
+
+            users.push(newApplicant);
+            saveUsers(users);
+            closeRegisterModal();
+
+            alert("Pendaftaran Berhasil Dikirim!\n\nData KTP, selfie wajah, dan kontak darurat Anda telah diterima. Admin ARISAN BY CI akan segera menghubungi nomor WhatsApp Anda untuk mengirimkan Username dan Password login.");
+            renderAppState();
+        }
+
+        // Admin Assign Credentials
+        let currentAssignMemberId = null;
+        function openAssignModal(memberId) {
+            const users = getUsers();
+            const groups = getGroups();
+            const m = users.find(u => u.id === memberId);
+            if (!m) return;
+
+            currentAssignMemberId = memberId;
+            const grp = groups.find(g => g.id === m.groupId) || { name: 'Arisan' };
+
+            document.getElementById("assignMemberName").value = m.fullName;
+            document.getElementById("assignMemberPhone").value = m.phoneNumber;
+            document.getElementById("assignGroupName").value = grp.name;
+
+            // Generate clean username based on name and group
+            const cleanName = m.fullName.toLowerCase().replace(/[^a-z0-9]/g, "").substring(0, 8);
+            const cleanGrp = grp.name.toLowerCase().includes("emas") ? "emas" : (grp.name.toLowerCase().includes("berlian") ? "berlian" : "arisan");
+            document.getElementById("assignUsername").value = cleanName + "_" + cleanGrp;
+            document.getElementById("assignPassword").value = "user" + Math.floor(100 + Math.random() * 900);
+
+            document.getElementById("modalAssignCredentials").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeAssignModal() {
+            document.getElementById("modalAssignCredentials").classList.add("hidden");
+        }
+
+        function confirmApproveAndSendWA() {
+            if (!currentAssignMemberId) return;
+            const users = getUsers();
+            const idx = users.findIndex(u => u.id === currentAssignMemberId);
+            if (idx === -1) return;
+
+            const u = users[idx];
+            const newUsername = document.getElementById("assignUsername").value.trim();
+            const newPassword = document.getElementById("assignPassword").value.trim();
+
+            u.username = newUsername;
+            u.password = newPassword;
+            u.verificationStatus = "VERIFIED";
+            saveUsers(users);
+
+            // Construct WhatsApp message
+            const groups = getGroups();
+            const grp = groups.find(g => g.id === u.groupId) || { name: 'ARISAN BY CI', monthlyDues: 1000000, adminFee: 50000, dueDateDay: 10 };
+            const msg = `Halo Kak ${u.fullName}! 👋%0A%0ASelamat, verifikasi dokumen KTP & wajah KYC Anda di *ARISAN BY CI* telah *DISETUJUI*!%0A%0ABerikut akun login resmi Anda:%0A👤 *Username:* ${newUsername}%0A🔑 *Password:* ${newPassword}%0A🏷️ *Kelompok:* ${grp.name}%0A📅 *Jatuh Tempo:* Setiap tanggal ${grp.dueDateDay}%0A%0ASilakan masuk ke aplikasi untuk melihat jadwal jatuh tempo, pembayaran QRIS resmi, dan putaran arisan. Terima kasih! 🙏`;
+
+            const waUrl = `https://wa.me/${cleanPhone(u.phoneNumber)}?text=${msg}`;
+            closeAssignModal();
+            renderAdminDashboard();
+
+            // Open WhatsApp
+            window.open(waUrl, "_blank");
+        }
+
+        // QRIS Modal
+        function openQrisModal() {
+            document.getElementById("modalQris").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeQrisModal() {
+            document.getElementById("modalQris").classList.add("hidden");
+        }
+
+        function handleConfirmPaymentWA() {
+            const user = getCurrentUser();
+            const groups = getGroups();
+            const grp = groups.find(g => g.id === user.groupId) || { name: 'ARISAN BY CI', monthlyDues: 1000000, adminFee: 50000 };
+            const total = formatRupiah(grp.monthlyDues + grp.adminFee);
+
+            const msg = `Halo Admin ARISAN BY CI,%0A%0ASaya sudah melakukan transfer iuran via QRIS untuk periode ini:%0A👤 *Nama:* ${user.fullName}%0A🔖 *Username:* ${user.username}%0A🏷️ *Kelompok:* ${grp.name}%0A💰 *Total Ditransfer:* ${total}%0A%0AMohon dicek dan diverifikasi status pembayaran saya di sistem. Terima kasih! 🙏`;
+            window.open(`https://wa.me/6281288889999?text=${msg}`, "_blank");
+        }
+
+        // iOS Modal
+        function showIosInstallModal() {
+            document.getElementById("modalIosInstall").classList.remove("hidden");
+            lucide.createIcons();
+        }
+
+        function closeIosInstallModal() {
+            document.getElementById("modalIosInstall").classList.add("hidden");
+        }
+
+        // Add Group Modal Stub
+        function openAddGroupModal() {
+            const name = prompt("Masukkan Nama Kelompok Arisan Baru:", "Arisan Platinum VIP");
+            if (!name) return;
+            const dues = parseInt(prompt("Nominal Iuran Bulanan (Rp):", "1500000"), 10) || 1000000;
+            const fee = parseInt(prompt("Biaya Admin (Rp):", "50000"), 10) || 50000;
+            const dueDay = parseInt(prompt("Tanggal Jatuh Tempo Bulanan (1-28):", "15"), 10) || 10;
+
+            const groups = getGroups();
+            groups.push({
+                id: Date.now(),
+                name: name,
+                monthlyDues: dues,
+                adminFee: fee,
+                dueDateDay: dueDay,
+                totalMembers: 10,
+                currentRound: 1
+            });
+            localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(groups));
+            renderAdminDashboard();
+            alert("Kelompok arisan baru berhasil ditambahkan!");
+        }
+
+        // Draw Winner Modal Stub
+        function openDrawWinnerModal() {
+            const groups = getGroups();
+            const grpName = prompt("Pilih Nomor Kelompok untuk Undian:\n" + groups.map((g, i) => `${i + 1}. ${g.name}`).join("\n"), "1");
+            const idx = parseInt(grpName, 10) - 1;
+            if (isNaN(idx) || !groups[idx]) return;
+
+            const selectedGrp = groups[idx];
+            const winnerName = prompt(`Masukkan Nama Pemenang untuk ${selectedGrp.name} (Putaran #${selectedGrp.currentRound}):`, "Siti Rahmawati");
+            if (!winnerName) return;
+
+            const totalPot = selectedGrp.monthlyDues * selectedGrp.totalMembers;
+            const winners = getWinners();
+            winners.unshift({
+                id: Date.now(),
+                groupId: selectedGrp.id,
+                round: selectedGrp.currentRound,
+                winnerName: winnerName,
+                amountWon: totalPot,
+                dateWon: new Date().toLocaleDateString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' })
+            });
+
+            selectedGrp.currentRound += 1;
+            localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(groups));
+            localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(winners));
+            renderAdminDashboard();
+            alert(`Selamat kepada ${winnerName} telah memenangkan ${formatRupiah(totalPot)} pada putaran ${selectedGrp.currentRound - 1}!`);
+        }
+
+        // Initialize on load
+        document.addEventListener("DOMContentLoaded", () => {
+            initSeedData();
+            renderAppState();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
