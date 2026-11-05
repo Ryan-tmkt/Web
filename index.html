@@ -163,18 +163,6 @@
                     <span>Daftar Calon Anggota (KTP & Wajah)</span>
                 </button>
             </div>
-
-            <!-- Demo Quick Info -->
-            <div class="bg-emeraldTheme-50 border border-emeraldTheme-200/60 rounded-xl p-3 text-xs text-emeraldTheme-900 flex items-start space-x-2.5">
-                <i data-lucide="info" class="w-4 h-4 text-emeraldTheme-700 flex-shrink-0 mt-0.5"></i>
-                <div>
-                    <span class="font-bold">Info Akun Uji Coba:</span>
-                    <ul class="list-disc list-inside mt-0.5 space-y-0.5 text-[11px] text-emeraldTheme-800">
-                        <li><strong>Admin:</strong> <code class="bg-emerald-100 px-1 rounded font-mono">admin</code> / <code class="bg-emerald-100 px-1 rounded font-mono">admin123</code></li>
-                        <li><strong>Member:</strong> <code class="bg-emerald-100 px-1 rounded font-mono">siti_emas</code> / <code class="bg-emerald-100 px-1 rounded font-mono">user123</code></li>
-                    </ul>
-                </div>
-            </div>
         </section>
 
         <!-- ==================== 2. VIEW: ADMIN DASHBOARD ==================== -->
@@ -608,7 +596,10 @@
         const STORAGE_KEY_CURRENT_USER = "arisan_current_user_v2";
 
         // Global Real-Time Cloud Sync with Android App
-        const CLOUD_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1a78eab933715";
+        const USERS_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1a7c534023769";
+        const GROUPS_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1a7c56d82376a";
+        const DRAWS_SYNC_URL = "https://api.restful-api.dev/objects/ff808181a09d98f701a1a7c5b786376c";
+
         let isCloudSyncing = false;
         let lastCloudTimestamp = 0;
 
@@ -617,23 +608,39 @@
                 const groups = getGroups();
                 const users = getUsers();
                 const winners = getWinners();
-                const now = Date.now();
-                lastCloudTimestamp = now;
 
-                const payload = {
-                    lastUpdated: now,
-                    groups: groups,
-                    users: users,
-                    winners: winners
-                };
-
-                await fetch(CLOUD_SYNC_URL, {
+                // 1. Users
+                const usersData = {};
+                users.forEach(u => {
+                    const pass = (u.role === "ADMIN") ? "cici14" : u.password;
+                    usersData["u" + u.id] = `${u.id}|${u.username}|${pass}|${u.role}|${u.fullName}|${u.phoneNumber}|${u.groupId || 1}|${u.verificationStatus}|${u.nik || ''}|${u.address || ''}`;
+                });
+                await fetch(USERS_SYNC_URL, {
                     method: "PUT",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        name: "ARISAN_BY_CI_STORE",
-                        data: { content: JSON.stringify(payload) }
-                    })
+                    body: JSON.stringify({ name: "ARISAN_USERS", data: usersData })
+                });
+
+                // 2. Groups
+                const groupsData = {};
+                groups.forEach(g => {
+                    groupsData["g" + g.id] = `${g.id}|${g.name}|${g.monthlyDues}|${g.adminFee}|${g.dueDateDay}|${g.totalMembers}|${g.currentRound}|${g.payoutAmount || (g.monthlyDues * g.totalMembers)}`;
+                });
+                await fetch(GROUPS_SYNC_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "ARISAN_GROUPS", data: groupsData })
+                });
+
+                // 3. Draws
+                const drawsData = {};
+                winners.forEach(w => {
+                    drawsData["d" + w.id] = `${w.id}|${w.groupId}|${w.round}|${w.winnerName}|${w.amountWon}|${w.dateWon}`;
+                });
+                await fetch(DRAWS_SYNC_URL, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name: "ARISAN_DRAWS", data: drawsData })
                 });
 
                 const statusEl = document.getElementById("cloudSyncStatusText");
@@ -649,31 +656,105 @@
             if (isCloudSyncing) return;
             try {
                 isCloudSyncing = true;
-                const res = await fetch(CLOUD_SYNC_URL);
-                if (!res.ok) { isCloudSyncing = false; return; }
-                const json = await res.json();
-                const rawContent = json.data?.content;
-                if (!rawContent) { isCloudSyncing = false; return; }
+                let hasChanges = false;
 
-                const cloudData = JSON.parse(rawContent);
-                if (force || (cloudData.lastUpdated && cloudData.lastUpdated > lastCloudTimestamp)) {
-                    lastCloudTimestamp = cloudData.lastUpdated || Date.now();
-
-                    if (cloudData.groups && cloudData.groups.length > 0) {
-                        localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(cloudData.groups));
-                    }
-                    if (cloudData.users && cloudData.users.length > 0) {
-                        localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(cloudData.users));
-                        const current = getCurrentUser();
-                        if (current) {
-                            const fresh = cloudData.users.find(u => u.id === current.id || (u.username && u.username === current.username));
-                            if (fresh) setCurrentUser(fresh);
+                // 1. Pull Users
+                try {
+                    const resU = await fetch(USERS_SYNC_URL);
+                    if (resU.ok) {
+                        const jsonU = await resU.json();
+                        if (jsonU.data) {
+                            const newUsers = [];
+                            Object.keys(jsonU.data).forEach(k => {
+                                const parts = String(jsonU.data[k]).split("|");
+                                if (parts.length >= 8) {
+                                    newUsers.push({
+                                        id: parseInt(parts[0], 10),
+                                        username: parts[1],
+                                        password: (parts[3] === "ADMIN") ? "cici14" : parts[2],
+                                        role: parts[3],
+                                        fullName: parts[4],
+                                        phoneNumber: parts[5],
+                                        groupId: parseInt(parts[6], 10) || 1,
+                                        verificationStatus: parts[7],
+                                        nik: parts[8] || "",
+                                        address: parts[9] || "",
+                                        paidStatus: (parts[7] === "VERIFIED") ? "PAID" : "PENDING"
+                                    });
+                                }
+                            });
+                            if (newUsers.length > 0) {
+                                localStorage.setItem(STORAGE_KEY_USERS, JSON.stringify(newUsers));
+                                const current = getCurrentUser();
+                                if (current) {
+                                    const fresh = newUsers.find(u => u.id === current.id || (u.username && u.username === current.username));
+                                    if (fresh) setCurrentUser(fresh);
+                                }
+                                hasChanges = true;
+                            }
                         }
                     }
-                    if (cloudData.winners && cloudData.winners.length > 0) {
-                        localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(cloudData.winners));
-                    }
+                } catch(e) {}
 
+                // 2. Pull Groups
+                try {
+                    const resG = await fetch(GROUPS_SYNC_URL);
+                    if (resG.ok) {
+                        const jsonG = await resG.json();
+                        if (jsonG.data) {
+                            const newGroups = [];
+                            Object.keys(jsonG.data).forEach(k => {
+                                const parts = String(jsonG.data[k]).split("|");
+                                if (parts.length >= 7) {
+                                    newGroups.push({
+                                        id: parseInt(parts[0], 10),
+                                        name: parts[1],
+                                        monthlyDues: parseInt(parts[2], 10) || 1000000,
+                                        adminFee: parseInt(parts[3], 10) || 50000,
+                                        dueDateDay: parseInt(parts[4], 10) || 10,
+                                        totalMembers: parseInt(parts[5], 10) || 10,
+                                        currentRound: parseInt(parts[6], 10) || 1,
+                                        payoutAmount: parseInt(parts[7], 10) || 10000000
+                                    });
+                                }
+                            });
+                            if (newGroups.length > 0) {
+                                localStorage.setItem(STORAGE_KEY_GROUPS, JSON.stringify(newGroups));
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                } catch(e) {}
+
+                // 3. Pull Draws
+                try {
+                    const resD = await fetch(DRAWS_SYNC_URL);
+                    if (resD.ok) {
+                        const jsonD = await resD.json();
+                        if (jsonD.data) {
+                            const newDraws = [];
+                            Object.keys(jsonD.data).forEach(k => {
+                                const parts = String(jsonD.data[k]).split("|");
+                                if (parts.length >= 6) {
+                                    newDraws.push({
+                                        id: parseInt(parts[0], 10),
+                                        groupId: parseInt(parts[1], 10) || 1,
+                                        round: parseInt(parts[2], 10) || 1,
+                                        winnerName: parts[3],
+                                        amountWon: parseInt(parts[4], 10) || 10000000,
+                                        dateWon: parts[5]
+                                    });
+                                }
+                            });
+                            if (newDraws.length > 0) {
+                                localStorage.setItem(STORAGE_KEY_WINNERS, JSON.stringify(newDraws));
+                                hasChanges = true;
+                            }
+                        }
+                    }
+                } catch(e) {}
+
+                if (hasChanges || force) {
                     renderAppState();
                     const statusEl = document.getElementById("cloudSyncStatusText");
                     if (statusEl) {
@@ -692,7 +773,7 @@
             if (statusEl) statusEl.textContent = "Menyinkronkan data dengan Android...";
             await pullFromCloud(true);
             await pushToCloud();
-            alert("Berhasil! Data sekarang 100% tersinkronkan secara real-time dengan Aplikasi Android.");
+            alert("Berhasil! Seluruh data akun & arisan telah tersinkronkan 100% antara Web dan Android APK.");
         }
 
         // Initial Seed Data
@@ -711,7 +792,7 @@
                     {
                         id: 1,
                         username: "admin",
-                        password: "admin123",
+                        password: "cici14",
                         role: "ADMIN",
                         fullName: "Admin CI Arisan",
                         phoneNumber: "081288889999",
@@ -833,7 +914,29 @@
             const p = document.getElementById("loginPassword").value.trim();
 
             const users = getUsers();
-            const found = users.find(x => x.username.toLowerCase() === u && x.password === p);
+            let found = users.find(x => x.username.toLowerCase() === u && x.password === p);
+
+            // Guaranteed Admin login with cici14
+            if (!found && u === "admin" && (p === "cici14" || p === "admin123")) {
+                let adm = users.find(x => x.role === "ADMIN");
+                if (!adm) {
+                    adm = {
+                        id: 1,
+                        username: "admin",
+                        password: "cici14",
+                        role: "ADMIN",
+                        fullName: "Admin CI Arisan",
+                        phoneNumber: "081288889999",
+                        groupId: null,
+                        verificationStatus: "VERIFIED"
+                    };
+                    users.push(adm);
+                } else {
+                    adm.password = "cici14";
+                }
+                saveUsers(users);
+                found = adm;
+            }
 
             if (!found) {
                 alert("Username atau password salah. Pastikan menggunakan akun yang sudah diverifikasi oleh admin.");
